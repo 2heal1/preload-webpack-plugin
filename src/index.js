@@ -26,6 +26,20 @@ class PreloadPlugin {
     this.webpackMajorVersion = 4
   }
 
+  isAllAssets(include) {
+    const includeType = typeof include;
+    if (includeType === 'string') {
+      return include === 'allAssets'
+    } else if (includeType === 'object') {
+      if (!Array.isArray(include)) {
+        return include.type === 'allAssets'
+      }
+      return false;
+    } else {
+      return false
+    }
+  }
+
   generateLinks (compilation, htmlPluginData) {
     const options = this.options
     const extractedChunks = extractChunks({
@@ -33,7 +47,7 @@ class PreloadPlugin {
       optionsInclude: options.include
     })
 
-    const htmlChunks = options.include === 'allAssets'
+    const htmlChunks = isAllAssets(options.include)
     // Handle all chunks.
       ? extractedChunks
     // Only handle chunks imported by this HtmlWebpackPlugin.
